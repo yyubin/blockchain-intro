@@ -167,6 +167,24 @@ def add_transaction():
 
 
 # Part 3 - Decentralizing our Blockchain
+# Connecting new nodes
+@app.route('/connect_node', method=['POST'])
+def connect_node():
+    data = request.get_json()
+    nodes = data.get('nodes')
+
+    if nodes is None:
+        return "No node", 400
+    for node in nodes:
+        blockchain.add_node(node)
+
+    response = {
+        'message' : 'All the nodes are now connected.',
+        'total_nodes': list(blockchain.nodes)
+    }
+
+    return jsonify(response), 201
+
 # Running!
 app.run(host='0.0.0.0', port=5010)
 
