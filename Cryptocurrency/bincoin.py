@@ -112,6 +112,10 @@ class Blockchain:
 app = Flask(__name__)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
+# Creating an address for the node on Port 5000
+node_address = str(uuid4()).replace('-', '')
+
+
 # Creating a Blockchain
 blockchain = Blockchain()
 
@@ -124,6 +128,7 @@ def mine_block():
 
     proof = blockchain.proof_of_work(previous_proof)
     previous_hash = blockchain.hash(previous_block)
+    blockchain.add_transaction(sender=node_address, receiver='yubin', amount=1)
 
     block = blockchain.create_block(proof, previous_hash)
 
@@ -131,9 +136,10 @@ def mine_block():
                 'index': block['index'],
                 'timestamp': block['timestamp'],
                 'proof': block['proof'],
-                'previous_hash': block['previous_hash']}
+                'previous_hash': block['previous_hash'],
+                'transactions': block['transactions']}
 
-    return jsonify(response), 200
+    return jsonify(response), 201
 
 
 # Getting the full Blockchain
@@ -142,6 +148,21 @@ def get_chain():
     response = {'chain': blockchain.chain,
                 'length': len(blockchain.chain)}
 
+    return jsonify(response), 200
+
+# Adding a new transaction to the Blockchain
+@app.route('/add_transactions', method=['POST'])
+def add_transaction():
+    data = request.get_json()
+    transaction_keys = ['sender', 'receiver', 'amount']
+
+    if not all(key in data for key in transaction_keys):
+        return 'Some elements of the transaction are missing', 400
+
+    index = blockchain.add_transaction(data['sender'], data['receiver'], data['amount'])
+    response = {
+        'message': f'This transaction will be added to Block {index}'
+    }
     return jsonify(response), 200
 
 
