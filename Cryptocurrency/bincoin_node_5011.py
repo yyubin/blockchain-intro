@@ -159,7 +159,7 @@ def is_valid():
 
 
 # Adding a new transaction to the Blockchain
-@app.route('/add_transactions', method=['POST'])
+@app.route('/add_transactions', methods=['POST'])
 def add_transaction():
     data = request.get_json()
     transaction_keys = ['sender', 'receiver', 'amount']
@@ -176,7 +176,7 @@ def add_transaction():
 
 # Part 3 - Decentralizing our Blockchain
 # Connecting new nodes
-@app.route('/connect_node', method=['POST'])
+@app.route('/connect_node', methods=['POST'])
 def connect_node():
     data = request.get_json()
     nodes = data.get('nodes')
