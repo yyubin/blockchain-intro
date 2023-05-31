@@ -103,9 +103,6 @@ class Blockchain:
         return False
 
 
-
-
-
 # Part 2 - Mining our Blockchains
 
 # Creating a Web App
@@ -114,7 +111,6 @@ app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
 # Creating an address for the node on Port 5000
 node_address = str(uuid4()).replace('-', '')
-
 
 # Creating a Blockchain
 blockchain = Blockchain()
@@ -150,6 +146,18 @@ def get_chain():
 
     return jsonify(response), 200
 
+
+# Checking if the Blockchain is valid
+@app.route('/is_valid', methods=['GET'])
+def is_valid():
+    is_valid = blockchain.is_chain_valid(blockchain.chain)
+    if is_valid:
+        response = {'message': 'All good. The blockchain is valid'}
+    else:
+        response = {'message': 'The blockchain is not valid'}
+    return jsonify(response), 200
+
+
 # Adding a new transaction to the Blockchain
 @app.route('/add_transactions', method=['POST'])
 def add_transaction():
@@ -179,12 +187,29 @@ def connect_node():
         blockchain.add_node(node)
 
     response = {
-        'message' : 'All the nodes are now connected.',
+        'message': 'All the nodes are now connected.',
         'total_nodes': list(blockchain.nodes)
     }
 
     return jsonify(response), 201
 
+
+# Replacing the chain by the longest chain if needed
+@app.route('/replace_chain', methods=['GET'])
+def replace_chain():
+    is_chain_replaced = blockchain.replace_chain()
+    if is_chain_replaced:
+        response = {
+            'message': 'The node had different chains so the chain was replaced by the longest chain',
+            'new_chain': blockchain.chain
+        }
+    else:
+        response = {
+            'message': 'All good. The chain is longest chain',
+            'actual_chain': blockchain.chain
+        }
+    return jsonify(response), 200
+
+
 # Running!
 app.run(host='0.0.0.0', port=5010)
-
